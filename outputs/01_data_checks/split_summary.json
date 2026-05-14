@@ -1,0 +1,18 @@
+{
+  "dataset_file": "Copia de 01_bo_vip_seed22_n100000.csv",
+  "selected_date_column": "de7_transmission_datetime",
+  "split_strategy": "january_to_may_train_june_test",
+  "train_rows": 83817,
+  "test_rows": 16186,
+  "train_start": "2025-01-01 00:01:51",
+  "train_end": "2025-05-31 23:58:18",
+  "test_start": "2025-06-01 00:00:04",
+  "test_end": "2025-06-30 00:13:36",
+  "date_parse_report": {
+    "de7_transmission_datetime": 1.0,
+    "de13_local_date": 1.0,
+    "de14_expiration_date": 1.0,
+    "de15_settlement_date": 0.9901802945911623,
+    "de50_currency_code_settlement": 1.0
+  }
+}

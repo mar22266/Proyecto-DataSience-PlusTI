@@ -1,0 +1,91 @@
+{
+  "selected_model_name": "custom_mobile_app_alert_quality",
+  "selected_metric_name": "mobile_app_alert_quality",
+  "selected_threshold_recall_90": 0.0052146334345946725,
+  "target_recall": 0.9,
+  "selection_priority": [
+    "mobile_app_false_positive_ratio lower",
+    "mobile_app_recall higher",
+    "all_test_false_positive_ratio lower",
+    "auc_pr higher"
+  ],
+  "selected_row": {
+    "model_name": "custom_mobile_app_alert_quality",
+    "custom_metric_key": "mobile_app_alert_quality",
+    "threshold_name": "recall_90",
+    "auc_roc": 0.9435103670563332,
+    "auc_pr": 0.8815178538715374,
+    "f1": 0.23006833712984054,
+    "precision": 0.13093077521389682,
+    "recall": 0.9474671669793621,
+    "specificity": 0.5116550116550117,
+    "false_positive_rate": 0.48834498834498835,
+    "false_positive_ratio": 0.8690692247861032,
+    "true_positives": 505,
+    "false_positives": 3352,
+    "true_negatives": 3512,
+    "false_negatives": 28,
+    "threshold": 0.0052146334345946725,
+    "predicted_positives": 3857,
+    "actual_positives": 533,
+    "segment": "mobile_app",
+    "rows": 7397,
+    "best_iteration": 159.0,
+    "best_score": "{\"valid\": {\"mobile_app_alert_quality\": 0.7350060818191636}}"
+  },
+  "best_tuning_params": {
+    "num_leaves": 63,
+    "min_data_in_leaf": 200,
+    "learning_rate": 0.04,
+    "feature_fraction": 0.9,
+    "bagging_fraction": 0.8,
+    "lambda_l2": 3.0
+  },
+  "best_tuning_iteration": 96,
+  "baseline_reference_row": [
+    {
+      "model_name": "baseline",
+      "custom_metric_key": "traditional_metrics",
+      "threshold_name": "recall_90",
+      "auc_roc": 0.9402344450421374,
+      "auc_pr": 0.7709929620540877,
+      "f1": 0.24932515337423314,
+      "precision": 0.14342179559570864,
+      "recall": 0.9530956848030019,
+      "specificity": 0.557983682983683,
+      "false_positive_rate": 0.442016317016317,
+      "false_positive_ratio": 0.8565782044042913,
+      "true_positives": 508,
+      "false_positives": 3034,
+      "true_negatives": 3830,
+      "false_negatives": 25,
+      "threshold": 0.04247158265844502,
+      "predicted_positives": 3542,
+      "actual_positives": 533,
+      "segment": "mobile_app",
+      "rows": 7397,
+      "best_iteration": NaN,
+      "best_score": NaN
+    }
+  ],
+  "dataset_file": "Copia de 01_bo_vip_seed22_n100000.csv",
+  "split_summary": {
+    "dataset_file": "Copia de 01_bo_vip_seed22_n100000.csv",
+    "selected_date_column": "de7_transmission_datetime",
+    "split_strategy": "january_to_may_train_june_test",
+    "train_rows": 83817,
+    "test_rows": 16186,
+    "train_start": "2025-01-01 00:01:51",
+    "train_end": "2025-05-31 23:58:18",
+    "test_start": "2025-06-01 00:00:04",
+    "test_end": "2025-06-30 00:13:36",
+    "date_parse_report": {
+      "de7_transmission_datetime": 1.0,
+      "de13_local_date": 1.0,
+      "de14_expiration_date": 1.0,
+      "de15_settlement_date": 0.9901802945911623,
+      "de50_currency_code_settlement": 1.0
+    }
+  },
+  "feature_count": 76
+}

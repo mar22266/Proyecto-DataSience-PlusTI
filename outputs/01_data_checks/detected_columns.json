@@ -1,0 +1,122 @@
+{
+  "date_column": {
+    "primary": "de7_transmission_datetime",
+    "candidates": [
+      "de7_transmission_datetime",
+      "de13_local_date",
+      "de14_expiration_date",
+      "de15_settlement_date",
+      "de50_currency_code_settlement"
+    ]
+  },
+  "amount_column": {
+    "primary": "amount_usd",
+    "candidates": [
+      "de4_amount_transaction",
+      "de6_amount_cardholder_billing",
+      "de41_terminal_id",
+      "de42_card_acceptor_id",
+      "de43_card_acceptor_name_location",
+      "de44_additional_response_data",
+      "de48_additional_data",
+      "de49_currency_code_transaction",
+      "de54_additional_amounts",
+      "de60_pos_terminal_type",
+      "de61_pos_extended_data",
+      "de63_network_specific",
+      "amount_local",
+      "amount_tx_currency",
+      "amount_usd",
+      "client_baseline_amount"
+    ]
+  },
+  "customer_column": {
+    "primary": "client_id",
+    "candidates": [
+      "client_id",
+      "client_segment",
+      "de6_amount_cardholder_billing",
+      "de102_account_id_1",
+      "client_baseline_amount",
+      "client_home_city"
+    ]
+  },
+  "card_column": {
+    "primary": "pan_hash",
+    "candidates": [
+      "card_brand",
+      "pan_masked",
+      "pan_hash",
+      "de2_pan",
+      "de6_amount_cardholder_billing",
+      "de22_pos_entry_mode",
+      "de23_card_seq_number",
+      "de25_pos_condition_code",
+      "de42_card_acceptor_id",
+      "de43_card_acceptor_name_location",
+      "de102_account_id_1",
+      "de103_account_id_2"
+    ]
+  },
+  "merchant_column": {
+    "primary": "de42_card_acceptor_id",
+    "candidates": [
+      "de18_merchant_category_code",
+      "de42_card_acceptor_id",
+      "de43_card_acceptor_name_location"
+    ]
+  },
+  "mcc_column": {
+    "primary": "de18_merchant_category_code",
+    "candidates": [
+      "de18_merchant_category_code"
+    ]
+  },
+  "country_column": {
+    "primary": "de19_acquirer_country_code",
+    "candidates": [
+      "bank_country",
+      "de19_acquirer_country_code"
+    ]
+  },
+  "currency_column": {
+    "primary": "currency_tx_alpha",
+    "candidates": [
+      "de49_currency_code_transaction",
+      "de50_currency_code_settlement",
+      "de51_currency_code_billing",
+      "amount_tx_currency",
+      "currency_tx_alpha"
+    ]
+  },
+  "channel_column": {
+    "primary": "channel",
+    "candidates": [
+      "channel",
+      "de60_pos_terminal_type"
+    ]
+  },
+  "pos_entry_mode_column": {
+    "primary": "de22_pos_entry_mode",
+    "candidates": [
+      "de22_pos_entry_mode",
+      "de123_pos_data_code"
+    ]
+  },
+  "device_column": {
+    "primary": "de60_pos_terminal_type",
+    "candidates": [
+      "de41_terminal_id",
+      "de60_pos_terminal_type"
+    ]
+  },
+  "ecommerce_app_related_columns": {
+    "primary": "channel",
+    "candidates": [
+      "channel",
+      "de25_pos_condition_code",
+      "de60_pos_terminal_type",
+      "de123_pos_data_code"
+    ]
+  }
+}
