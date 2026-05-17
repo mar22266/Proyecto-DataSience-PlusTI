@@ -31,3 +31,19 @@ pip install -r requirements.txt
 3. Abrir `ObjetivoA.ipynb`.
 4. Ejecutar todas las celdas de arriba hacia abajo.
 5. Revisar resultados en la carpeta `outputs`.
+
+## Outputs
+
+El notebook genera resultados organizados en subcarpetas dentro de `outputs`:
+
+- `01_data_checks`: validaciones y archivos de control.
+- `02_eda`: resumenes del analisis exploratorio.
+- `03_features`: lista de variables usadas por el modelo.
+- `04_baseline`: metricas y predicciones del baseline.
+- `05_custom_metrics`: comparacion de modelos con metricas custom.
+- `06_tuning`: resultados del tuning ligero.
+- `07_final_model`: modelo final metricas finales y predicciones.
+- `08_plots`: graficas generadas.
+- `09_delivery`: espacio para archivos finales de entrega.
+
+Tambien se genera `outputs/output_index.csv` como indice de los archivos producidos.
