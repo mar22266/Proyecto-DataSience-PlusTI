@@ -23,3 +23,11 @@ pip install -r requirements.txt
 - Modelo LightGBM con metrica custom `mobile_app_recall_constrained_fp_ratio`.
 - Modelo LightGBM con metrica custom `mobile_app_alert_quality`.
 - Modelo final con tuning ligero de hiperparametros.
+
+## Guia de uso
+
+1. Confirmar que el dataset principal esta en la raiz del proyecto.
+2. Instalar dependencias con `requirements.txt`.
+3. Abrir `ObjetivoA.ipynb`.
+4. Ejecutar todas las celdas de arriba hacia abajo.
+5. Revisar resultados en la carpeta `outputs`.
