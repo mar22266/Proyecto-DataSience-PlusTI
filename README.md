@@ -1,1 +1,25 @@
-# Proyecto-DataSience-PlusTI
+# Objetivo A
+
+Este proyecto desarrolla un flujo completo en Python para deteccion de fraude en transacciones originadas desde aplicaciones moviles o canales digitales equivalentes. El objetivo principal es comparar metricas tradicionales y metricas custom en LightGBM para reducir falsos positivos sin perder capacidad de deteccion de fraude.
+
+El cuaderno principal es `ObjetivoA.ipynb`. Este notebook carga el dataset `01_bo_vip_seed22_n100000.csv` o su equivalente local `Copia de 01_bo_vip_seed22_n100000.csv`, realiza EDA, construye una proxy de transacciones mobile app, genera variables predictivas, entrena modelos LightGBM y evalua resultados generales y por segmento mobile app.
+
+## Version de Python
+
+Se requiere Python 3.11 o superior. Se recomienda usar Python 3.12 para evitar conflictos con las versiones fijadas en `requirements.txt`.
+
+## Instalacion
+
+Desde la raiz del proyecto ejecutar:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Modelos implementados
+
+- Modelo baseline LightGBM con metricas tradicionales.
+- Modelo LightGBM con metrica custom `mobile_app_false_positive_ratio`.
+- Modelo LightGBM con metrica custom `mobile_app_recall_constrained_fp_ratio`.
+- Modelo LightGBM con metrica custom `mobile_app_alert_quality`.
+- Modelo final con tuning ligero de hiperparametros.
