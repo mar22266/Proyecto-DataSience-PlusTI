@@ -1,0 +1,4 @@
+bank_key,target_available,negative_count,positive_count,positive_rate
+bank_1,True,95084.0,4919.0,0.04918852434426967
+bank_2,True,96795.0,3205.0,0.03205
+bank_3,False,,,

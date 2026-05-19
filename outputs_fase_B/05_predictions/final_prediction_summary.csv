@@ -1,2 +1,2 @@
 strategy_name,row_count,predicted_fraud_count,predicted_fraud_rate,threshold,delivery_file,audit_file
-central_hist_gradient_boosting_model,100000,2240,0.0224,0.85,bank_3_full_final_inference.xlsx,bank_3_full_final_inference_audit.csv
+central_hist_gradient_boosting_model,100000,1739,0.01739,0.85,bank_3_full_final_inference.xlsx,bank_3_full_final_inference_audit.csv

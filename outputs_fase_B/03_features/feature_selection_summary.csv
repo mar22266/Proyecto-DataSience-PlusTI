@@ -1,5 +1,5 @@
 metric,value
-selected_feature_count,44
-numeric_feature_count,34
+selected_feature_count,58
+numeric_feature_count,48
 categorical_feature_count,10
 excluded_feature_count,38
