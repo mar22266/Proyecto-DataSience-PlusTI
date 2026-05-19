@@ -1,0 +1,268 @@
+[
+  {
+    "feature_name": "amount_tx_currency",
+    "reason": "local_currency",
+    "dtype": "float64",
+    "missing_rate": 0.0,
+    "cardinality": 132434
+  },
+  {
+    "feature_name": "bank_code",
+    "reason": "bank_identifier",
+    "dtype": "object",
+    "missing_rate": 0.0,
+    "cardinality": 2
+  },
+  {
+    "feature_name": "bank_country",
+    "reason": "bank_identifier",
+    "dtype": "object",
+    "missing_rate": 0.0,
+    "cardinality": 2
+  },
+  {
+    "feature_name": "bank_name",
+    "reason": "bank_identifier",
+    "dtype": "object",
+    "missing_rate": 0.0,
+    "cardinality": 2
+  },
+  {
+    "feature_name": "bank_tier",
+    "reason": "bank_identifier",
+    "dtype": "object",
+    "missing_rate": 0.0,
+    "cardinality": 2
+  },
+  {
+    "feature_name": "client_home_city",
+    "reason": "local_geography",
+    "dtype": "object",
+    "missing_rate": 0.0,
+    "cardinality": 16
+  },
+  {
+    "feature_name": "client_id",
+    "reason": "direct_identifier",
+    "dtype": "object",
+    "missing_rate": 0.0,
+    "cardinality": 8000
+  },
+  {
+    "feature_name": "currency_tx_alpha",
+    "reason": "local_currency",
+    "dtype": "object",
+    "missing_rate": 0.0,
+    "cardinality": 7
+  },
+  {
+    "feature_name": "de102_account_id_1",
+    "reason": "direct_identifier",
+    "dtype": "object",
+    "missing_rate": 0.010079848802267966,
+    "cardinality": 8001
+  },
+  {
+    "feature_name": "de103_account_id_2",
+    "reason": "direct_identifier",
+    "dtype": "float64",
+    "missing_rate": 1.0,
+    "cardinality": 1
+  },
+  {
+    "feature_name": "de11_stan",
+    "reason": "direct_identifier",
+    "dtype": "int64",
+    "missing_rate": 0.0,
+    "cardinality": 200003
+  },
+  {
+    "feature_name": "de12_local_time",
+    "reason": "raw_date_identifier",
+    "dtype": "int64",
+    "missing_rate": 0.0,
+    "cardinality": 73658
+  },
+  {
+    "feature_name": "de13_local_date",
+    "reason": "raw_date_identifier",
+    "dtype": "int64",
+    "missing_rate": 0.0,
+    "cardinality": 182
+  },
+  {
+    "feature_name": "de14_expiration_date",
+    "reason": "raw_date_identifier",
+    "dtype": "int64",
+    "missing_rate": 0.0,
+    "cardinality": 71
+  },
+  {
+    "feature_name": "de15_settlement_date",
+    "reason": "raw_date_identifier",
+    "dtype": "float64",
+    "missing_rate": 0.010034849477257841,
+    "cardinality": 183
+  },
+  {
+    "feature_name": "de19_acquirer_country_code",
+    "reason": "local_geography",
+    "dtype": "int64",
+    "missing_rate": 0.0,
+    "cardinality": 9
+  },
+  {
+    "feature_name": "de2_pan",
+    "reason": "direct_identifier",
+    "dtype": "float64",
+    "missing_rate": 0.0,
+    "cardinality": 12
+  },
+  {
+    "feature_name": "de35_track2_data_masked",
+    "reason": "direct_identifier",
+    "dtype": "object",
+    "missing_rate": 0.010029849552256716,
+    "cardinality": 7989
+  },
+  {
+    "feature_name": "de37_retrieval_reference_number",
+    "reason": "direct_identifier",
+    "dtype": "object",
+    "missing_rate": 0.0,
+    "cardinality": 200003
+  },
+  {
+    "feature_name": "de38_authorization_code",
+    "reason": "direct_identifier",
+    "dtype": "object",
+    "missing_rate": 0.0288395674064889,
+    "cardinality": 194229
+  },
+  {
+    "feature_name": "de41_terminal_id",
+    "reason": "direct_identifier",
+    "dtype": "object",
+    "missing_rate": 0.010149847752283716,
+    "cardinality": 1989
+  },
+  {
+    "feature_name": "de42_card_acceptor_id",
+    "reason": "direct_identifier",
+    "dtype": "object",
+    "missing_rate": 0.009984850227246591,
+    "cardinality": 1001
+  },
+  {
+    "feature_name": "de43_card_acceptor_name_location",
+    "reason": "high_cardinality",
+    "dtype": "object",
+    "missing_rate": 0.0,
+    "cardinality": 2438
+  },
+  {
+    "feature_name": "de44_additional_response_data",
+    "reason": "high_missing_rate",
+    "dtype": "object",
+    "missing_rate": 0.9711604325935111,
+    "cardinality": 11
+  },
+  {
+    "feature_name": "de48_additional_data",
+    "reason": "high_missing_rate",
+    "dtype": "float64",
+    "missing_rate": 1.0,
+    "cardinality": 1
+  },
+  {
+    "feature_name": "de49_currency_code_transaction",
+    "reason": "local_currency",
+    "dtype": "int64",
+    "missing_rate": 0.0,
+    "cardinality": 7
+  },
+  {
+    "feature_name": "de50_currency_code_settlement",
+    "reason": "local_currency",
+    "dtype": "int64",
+    "missing_rate": 0.0,
+    "cardinality": 2
+  },
+  {
+    "feature_name": "de51_currency_code_billing",
+    "reason": "local_currency",
+    "dtype": "int64",
+    "missing_rate": 0.0,
+    "cardinality": 2
+  },
+  {
+    "feature_name": "de54_additional_amounts",
+    "reason": "high_missing_rate",
+    "dtype": "float64",
+    "missing_rate": 1.0,
+    "cardinality": 1
+  },
+  {
+    "feature_name": "de56_original_data",
+    "reason": "high_missing_rate",
+    "dtype": "float64",
+    "missing_rate": 1.0,
+    "cardinality": 1
+  },
+  {
+    "feature_name": "de7_transmission_datetime",
+    "reason": "raw_date_identifier",
+    "dtype": "int64",
+    "missing_rate": 0.0,
+    "cardinality": 198594
+  },
+  {
+    "feature_name": "distance_from_home_km",
+    "reason": "direct_identifier",
+    "dtype": "float64",
+    "missing_rate": 0.009774853377199341,
+    "cardinality": 11452
+  },
+  {
+    "feature_name": "distance_from_home_numeric",
+    "reason": "direct_identifier",
+    "dtype": "float64",
+    "missing_rate": 0.009774853377199341,
+    "cardinality": 11452
+  },
+  {
+    "feature_name": "log_distance_from_home",
+    "reason": "direct_identifier",
+    "dtype": "float64",
+    "missing_rate": 0.009774853377199341,
+    "cardinality": 11452
+  },
+  {
+    "feature_name": "missing_distance_indicator",
+    "reason": "direct_identifier",
+    "dtype": "int32",
+    "missing_rate": 0.0,
+    "cardinality": 2
+  },
+  {
+    "feature_name": "pan_hash",
+    "reason": "direct_identifier",
+    "dtype": "object",
+    "missing_rate": 0.0,
+    "cardinality": 8000
+  },
+  {
+    "feature_name": "pan_masked",
+    "reason": "direct_identifier",
+    "dtype": "object",
+    "missing_rate": 0.0,
+    "cardinality": 7478
+  },
+  {
+    "feature_name": "transaction_id",
+    "reason": "direct_identifier",
+    "dtype": "object",
+    "missing_rate": 0.0,
+    "cardinality": 200003
+  }
+]
