@@ -1,0 +1,4 @@
+bank_key,file_name,separator,row_count,column_count,has_is_fraud,target_has_valid_values
+bank_1,Copia de 01_bo_vip_seed22_n100000.csv,;,100003,66,True,True
+bank_2,Copia de 02_br_privado_seed33_n100000.csv,;,100000,66,True,True
+bank_3,Copia de 03_gt_estatal_seed3_n100000.csv,;,100000,66,True,False
