@@ -1,0 +1,4 @@
+bank_key,has_target,target_used_for_training,positive_count,negative_count
+bank_1,True,True,4919.0,95084.0
+bank_2,True,True,3205.0,96795.0
+bank_3,True,False,,

@@ -1,0 +1,150 @@
+{
+  "transaction_id": {
+    "primary_column": "transaction_id",
+    "candidate_columns": [
+      "de11_stan",
+      "de37_retrieval_reference_number",
+      "distance_from_home_km",
+      "transaction_id"
+    ]
+  },
+  "date": {
+    "primary_column": "de7_transmission_datetime",
+    "candidate_columns": [
+      "de13_local_date",
+      "de14_expiration_date",
+      "de15_settlement_date",
+      "de50_currency_code_settlement",
+      "de7_transmission_datetime"
+    ]
+  },
+  "amount": {
+    "primary_column": "amount_usd",
+    "candidate_columns": [
+      "amount_local",
+      "amount_tx_currency",
+      "amount_usd",
+      "client_baseline_amount",
+      "de41_terminal_id",
+      "de42_card_acceptor_id",
+      "de43_card_acceptor_name_location",
+      "de44_additional_response_data",
+      "de48_additional_data",
+      "de49_currency_code_transaction",
+      "de4_amount_transaction",
+      "de54_additional_amounts",
+      "de60_pos_terminal_type",
+      "de61_pos_extended_data",
+      "de63_network_specific",
+      "de6_amount_cardholder_billing"
+    ]
+  },
+  "customer": {
+    "primary_column": "client_id",
+    "candidate_columns": [
+      "client_baseline_amount",
+      "client_home_city",
+      "client_id",
+      "client_segment",
+      "de102_account_id_1",
+      "de103_account_id_2",
+      "de6_amount_cardholder_billing"
+    ]
+  },
+  "card": {
+    "primary_column": "pan_hash",
+    "candidate_columns": [
+      "card_brand",
+      "de22_pos_entry_mode",
+      "de23_card_seq_number",
+      "de25_pos_condition_code",
+      "de2_pan",
+      "de42_card_acceptor_id",
+      "de43_card_acceptor_name_location",
+      "de6_amount_cardholder_billing",
+      "pan_hash",
+      "pan_masked"
+    ]
+  },
+  "merchant": {
+    "primary_column": "de42_card_acceptor_id",
+    "candidate_columns": [
+      "de18_merchant_category_code",
+      "de42_card_acceptor_id",
+      "de43_card_acceptor_name_location"
+    ]
+  },
+  "mcc": {
+    "primary_column": "de18_merchant_category_code",
+    "candidate_columns": [
+      "de18_merchant_category_code"
+    ]
+  },
+  "country": {
+    "primary_column": "bank_country",
+    "candidate_columns": [
+      "bank_country",
+      "de19_acquirer_country_code"
+    ]
+  },
+  "currency": {
+    "primary_column": "currency_tx_alpha",
+    "candidate_columns": [
+      "amount_tx_currency",
+      "currency_tx_alpha",
+      "de49_currency_code_transaction",
+      "de50_currency_code_settlement",
+      "de51_currency_code_billing"
+    ]
+  },
+  "channel": {
+    "primary_column": "channel",
+    "candidate_columns": [
+      "channel",
+      "de60_pos_terminal_type"
+    ]
+  },
+  "pos_entry_mode": {
+    "primary_column": "de22_pos_entry_mode",
+    "candidate_columns": [
+      "de123_pos_data_code",
+      "de22_pos_entry_mode"
+    ]
+  },
+  "device": {
+    "primary_column": "de41_terminal_id",
+    "candidate_columns": [
+      "de41_terminal_id",
+      "de60_pos_terminal_type"
+    ]
+  },
+  "distance": {
+    "primary_column": "distance_from_home_km",
+    "candidate_columns": [
+      "distance_from_home_km"
+    ]
+  },
+  "hour": {
+    "primary_column": "hour_local",
+    "candidate_columns": [
+      "de123_pos_data_code",
+      "de12_local_time",
+      "hour_local"
+    ]
+  },
+  "approved_response": {
+    "primary_column": "approved",
+    "candidate_columns": [
+      "approved",
+      "de39_response_code",
+      "de44_additional_response_data",
+      "response_description"
+    ]
+  },
+  "baseline_amount": {
+    "primary_column": "client_baseline_amount",
+    "candidate_columns": [
+      "client_baseline_amount"
+    ]
+  }
+}
