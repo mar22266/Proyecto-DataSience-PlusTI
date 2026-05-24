@@ -1,0 +1,336 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{url}
+
+\geometry{
+  left=1.55cm,
+  right=1.55cm,
+  top=1.55cm,
+  bottom=1.65cm
+}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=blue
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.38em}
+\renewcommand{\arraystretch}{1.08}
+\sloppy
+
+\title{\textbf{Informe técnico -- Trabajo teórico-práctico}\\
+\large Convenio PLUS TI -- Universidad del Valle 2026}
+\author{
+Andre Marroquín -- Carné: 22266\\
+Gabriel Paz -- Carné: 221087\\
+Mauricio Lemus -- Carné: 22461
+}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Resumen}
+
+El trabajo se desarrolló en dos fases. En la primera fase se trabajó con el dataset
+\texttt{01\_bo\_vip\_seed22\_n100000.csv}, correspondiente a transacciones sintéticas de tarjetas
+de crédito de un banco de Bolivia con clientela VIP. El objetivo principal fue evaluar modelos 
+de clasificación binaria para detectar fraude, dando especial importancia a la reducción de 
+falsos positivos entre las alertas generadas. La métrica principal usada para comparar estrategias fue:
+
+\[
+\text{ratio de falsos positivos} = \frac{FP}{TP + FP}
+\]
+
+Esta métrica mide qué proporción de las alertas marcadas como fraude son realmente falsas alarmas.
+Esto es importante en fraude porque un modelo puede tener buen recall y parecer adecuado
+en las métricas generales, pero resultar poco útil en la operación si genera demasiadas
+alertas incorrectas.
+
+En la segunda fase se trabajó con tres bancos. Banco~1 y Banco~2 tenían etiqueta real
+\texttt{is\_fraud} y se utilizaron para entrenamiento, validación y comparación de estrategias.
+Banco~3 era el conjunto objetivo que había que predecir, por lo que se
+trató como no etiquetado y se utilizó para generar las inferencias. A partir de
+Banco~1 y Banco~2 se entrenaron modelos locales por banco, se construyeron ensambles federados
+simulados y se compararon contra modelos centralizados.
+
+Los notebooks anexos son:
+
+\begin{itemize}[leftmargin=*]
+  \item \texttt{ObjetivoA.ipynb}: implementación completa de métricas custom con LightGBM.
+  \item \texttt{ObjetivoB.ipynb}: entrenamiento federado simulado, comparación de estrategias
+        e inferencia sobre Banco~3.
+\end{itemize}
+
+\section{Metodología}
+
+\subsection{Fase A: métricas custom para reducir falsos positivos}
+
+El dataset de Banco~1 contiene 100{,}003 transacciones, con 4{,}919 fraudes y 95{,}084 operaciones
+legítimas. La tasa global de fraude es de 4.92\%, por lo que se trata de un problema desbalanceado.
+Se construyó una variable proxy para identificar transacciones de app móvil o canal digital
+equivalente, derivada a partir de señales como canal e-commerce, terminal virtual, modo de
+entrada POS y condición de comercio electrónico.
+
+El segmento mobile/app quedó compuesto por 46{,}312 transacciones, con una tasa de fraude
+de 8.02\%. El resto del dataset tuvo una tasa de 2.24\%. Esta diferencia justificó evaluar
+el desempeño global y también el comportamiento específico del modelo en el segmento digital.
+
+La separación se manejó de la siguiente manera: entrenamiento con enero--mayo de 2025 y evaluación con
+junio de 2025. El conjunto de entrenamiento quedó con 83{,}817 filas y el de prueba con 16{,}186 filas.
+
+La ingeniería de variables incluyó indicadores temporales, comportamiento por cliente,
+contadores recientes y desviaciones de monto:
+
+\begin{itemize}[leftmargin=*, itemsep=0pt]
+  \item \texttt{time\_since\_last\_txn\_min}, \texttt{txn\_count\_last\_1h},
+        \texttt{txn\_count\_last\_24h}
+  \item \texttt{amount\_zscore\_customer}, \texttt{amount\_ratio\_customer\_mean},
+        \texttt{amount\_ratio\_customer\_median}
+  \item Contadores históricos por cliente, tarjeta y comercio
+  \item Variables de canal digital, horario nocturno, fin de semana y transacción internacional
+\end{itemize}
+
+Se entrenó un modelo base LightGBM con métricas tradicionales y tres variantes con funciones
+\texttt{feval} personalizadas:
+
+\begin{center}
+\small
+\begin{tabular}{p{0.39\textwidth} p{0.53\textwidth}}
+\toprule
+\textbf{Métrica custom} & \textbf{Intención} \\
+\midrule
+\texttt{mobile\_app\_false\_positive\_ratio}
+  & Minimizar directamente la proporción de falsos positivos en el segmento mobile/app. \\[4pt]
+\texttt{mobile\_app\_recall\_}\newline\texttt{constrained\_fp\_ratio}
+  & Reducir falsos positivos penalizando si el recall cae por debajo de 90\%. \\[4pt]
+\texttt{mobile\_app\_alert\_quality}
+  & Combinar recall, proporción de falsos positivos y volumen de alertas para
+    buscar alertas más útiles. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+El criterio principal de comparación fue alcanzar aproximadamente 90\% de detección y,
+bajo esa restricción, seleccionar la estrategia con menor \texttt{FP\,/\,(TP\,+\,FP)}.
+
+\subsection{Fase B: entrenamiento federado simulado e inferencia sobre Banco 3}
+
+Para la segunda fase se cargaron tres datasets correspondientes a bancos de distintos países
+y segmentos:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Banco} & \textbf{País} & \textbf{Segmento} \\
+\midrule
+Banco 1 & Bolivia  & VIP \\
+Banco 2 & Brasil   & Privado \\
+Banco 3 & Guatemala & Estatal \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Solo Banco~1 y Banco~2 contaban con etiqueta válida. Banco~3 se utilizó para generar
+la predicción final de fraude.
+
+La ingeniería de variables fue la misma para los tres bancos e incluyó: transformaciones numéricas
+(\texttt{log\_amount}, ratio respecto al baseline del cliente), indicadores temporales (hora,
+día, mes, transacción nocturna, horario hábil), proxies de canal digital (e-commerce, entrada
+manual, contactless), y contadores/acumuladores por cliente, tarjeta y comercio (conteo de
+transacciones, monto total, monto promedio, ratio monto/promedio, conteo de comercios únicos).
+
+Para controlar la fuga de información se excluyeron identificadores directos de banco, cliente,
+tarjeta, comercio y terminal; columnas de país, ciudad y moneda local; y columnas con
+más del 95\% de nulos o cardinalidad excesiva. Esto lo que hizo fue obligar al modelo a aprender patrones
+transaccionales generalizables y no memorizar la información específica de cada institución.
+
+Las estrategias entrenadas y comparadas fueron:
+
+\begin{center}
+\small
+\begin{tabular}{p{0.46\textwidth} p{0.46\textwidth}}
+\toprule
+\textbf{Estrategia} & \textbf{Descripción} \\
+\midrule
+Modelo local Banco~1
+  & ExtraTrees entrenado exclusivamente con datos de Banco~1. \\[3pt]
+Modelo local Banco~2
+  & ExtraTrees entrenado exclusivamente con datos de Banco~2. \\[3pt]
+Ensamble federado (pesos iguales)
+  & Promedio simple de probabilidades de los modelos locales. \\[3pt]
+Ensamble federado (pesos por desempeño)
+  & Promedio ponderado por F1 en validación de cada modelo local. \\[3pt]
+Centralizado baseline (ExtraTrees)
+  & Modelo entrenado con datos combinados de Banco~1 y Banco~2. \\[3pt]
+Centralizado logístico
+  & Regresión logística sobre datos combinados. \\[3pt]
+Centralizado boosting
+  & HistGradientBoosting sobre datos combinados. \\[3pt]
+Boosting con hiperparámetros tuneados
+  & HistGradientBoosting optimizado con GridSearchCV y validación cruzada. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+La búsqueda de hiperparámetros exploró combinaciones de \texttt{max\_iter},
+\texttt{learning\_rate}, \texttt{max\_leaf\_nodes} y \texttt{l2\_regularization}
+mediante \texttt{GridSearchCV} con validación cruzada estratificada.
+El mejor estimador se reentrenó con todos los datos disponibles antes de competir
+en la selección final.
+
+La selección de la metodología final se realizó mediante puntuaciones compuestas que combinaban
+F1 promedio entre bancos, F1 mínimo entre bancos, ROC AUC, recall y penalización por
+false positive ratio. La estrategia que mejor resultado dió en la puntuación se usó para la
+inferencia final sobre el 100\% de Banco~3.
+
+\section{Descripción de la implementación práctica}
+
+La Fase~A está hecha en \texttt{ObjetivoA.ipynb}. El notebook normaliza nombres
+de columnas, valida el target, detecta columnas relevantes del estándar ISO~8583,
+construye la fecha transaccional desde \texttt{de7\_transmission\_datetime}, separa
+enero--mayo contra junio, crea variables predictivas y entrena LightGBM. La evaluación
+se hizo con umbral fijo 0.50 y con un umbral elegido automáticamente para alcanzar
+recall cercano a 90\%, que fue el punto principal de comparación.
+
+La Fase~B está hecha en \texttt{ObjetivoB.ipynb}. El notebook carga los tres
+bancos, genera variables equivalentes,
+excluye columnas con riesgo de fuga y entrena las estrategias locales, federadas
+simuladas y centralizadas. Los modelos se guardaron en
+\nolinkurl{outputs_fase_B/04_models}, los reportes en
+\nolinkurl{outputs_fase_B/07_reports} y las inferencias en
+\nolinkurl{outputs_fase_B/05_predictions}.
+
+\section{Análisis de resultados}
+
+\subsection{Fase A}
+
+El modelo seleccionado como final fue el baseline LightGBM con métricas tradicionales.
+Al buscar el umbral que garantiza recall cercano a 90\% en el segmento mobile/app,
+el baseline presentó el menor ratio de falsos positivos de las estrategias evaluadas.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{0.36\textwidth}rrrrr}
+\toprule
+\textbf{Estrategia} & \textbf{Recall} & \textbf{Prec.} & \textbf{FP} & \textbf{TP} & \textbf{Ratio FP} \\
+\midrule
+Baseline LightGBM & 95.31\% & 14.34\% & 3{,}034 & 508 & 85.66\% \\
+\texttt{mobile\_app\_alert\_quality} & 95.31\% & 12.81\% & 3{,}458 & 508 & 87.19\% \\
+\texttt{mobile\_app\_recall\_constrained\_fp\_ratio} & 95.50\% & 12.68\% & 3{,}506 & 509 & 87.32\% \\
+Modelo tuneado custom & 95.50\% & 11.78\% & 3{,}813 & 509 & 88.22\% \\
+\texttt{mobile\_app\_false\_positive\_ratio} & 100.00\% & 7.21\% & 6{,}864 & 533 & 92.79\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Las métricas custom mejoraron el ordenamiento del modelo. Por ejemplo,
+\texttt{mobile\_app\_recall\_constrained\_fp\_ratio} alcanzó AUC PR de 0.885 en
+mobile/app frente a 0.771 del baseline. Sin embargo, al forzar una detección cerca
+a 90\%, ese mejor ranking no se convirtió en menor proporción de falsos positivos.
+Con umbral fijo 0.50 sí aparecieron alertas más limpias. La métrica
+\texttt{mobile\_app\_recall\_constrained\_fp\_ratio} logró 82.36\% de recall,
+93.40\% de precisión y 6.60\% de ratio FP en mobile/app, pero no alcanzó el recall
+establecido anteriormente para la comparación principal.
+
+\subsection{Fase B}
+
+Los modelos locales de Banco~1 y Banco~2 se usaron como base para los ensambles federados
+simulados. Para la selección final se compararon seis estrategias candidatas sobre los
+conjuntos de validación de Banco~1 y Banco~2. La estrategia final se eligió con una
+puntuación compuesta que pondera F1 promedio, F1 mínimo entre bancos, ROC AUC, recall
+y penaliza el ratio de falsos positivos.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{0.35\textwidth}rrrrrr}
+\toprule
+\textbf{Estrategia} & \textbf{Umbral} & \textbf{F1 prom.} & \textbf{F1 mín.} & \textbf{ROC AUC} & \textbf{Recall} & \textbf{Ratio FP} \\
+\midrule
+HistGradientBoosting central & 0.85 & 0.801 & 0.796 & 0.878 & 0.687 & 0.041 \\
+HistGradientBoosting tuneado & 0.85 & 0.794 & 0.784 & 0.880 & 0.674 & 0.033 \\
+ExtraTrees centralizado & 0.80 & 0.676 & 0.623 & 0.872 & 0.603 & 0.223 \\
+Regresión logística central & 0.90 & 0.592 & 0.572 & 0.867 & 0.456 & 0.157 \\
+Federado ponderado & 0.65 & 0.556 & 0.409 & 0.864 & 0.523 & 0.406 \\
+Federado pesos iguales & 0.60 & 0.544 & 0.393 & 0.863 & 0.556 & 0.467 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+La mejor estrategia desarrollada fue \texttt{central\_hist\_gradient\_boosting\_model}
+con umbral 0.85. Los ensambles federados simulados permitieron comparar transferencia
+entre bancos, pero no superaron al mejor modelo centralizado. El federado ponderado
+mejoró al federado de pesos iguales en ratio FP, aunque mantuvo menor estabilidad entre
+bancos.
+
+Las inferencias sobre el primer 30\% de Banco~3 se generaron con tres
+estrategias (baseline centralizado, ensamble con pesos iguales y ensamble ponderado)
+y quedan en \nolinkurl{outputs_fase_B/05_predictions}. Para la inferencia final sobre
+el 100\% de Banco~3 se usó la estrategia ganadora, con 1{,}739 fraudes predichos sobre
+100{,}000 transacciones, equivalente a una tasa esperada de 1.74\%.
+
+\section{Dataset 3 con inferencia realizada}
+
+La inferencia final para Banco~3 quedó guardada en:
+
+\begin{center}
+\nolinkurl{outputs_fase_B/05_predictions/bank_3_full_final_inference.xlsx}
+\end{center}
+
+El archivo contiene una única columna llamada \texttt{is\_fraud}, con valores
+\texttt{True} o \texttt{False}, y mantiene las 100{,}000 transacciones en el orden de
+entrada. También se generó el archivo de auditoría:
+
+\begin{center}
+\nolinkurl{outputs_fase_B/05_predictions/bank_3_full_final_inference_audit.csv}
+\end{center}
+
+Ese archivo de auditoría no es el final, pero permite revisar la
+probabilidad asignada, el umbral utilizado y la estrategia que generó cada predicción.
+
+\section{Conclusiones}
+
+El trabajo permitió ver dos enfoques para la detección de fraude transaccional.
+En la Fase~A se evidenció que el uso de funciones \texttt{feval} personalizadas en LightGBM
+permite ajustar el comportamiento del modelo hacia criterios operativos específicos,
+aunque su efecto depende del régimen de umbral bajo el cual se evalúe el modelo.
+La división temporal del conjunto de prueba permitió realizar una evaluación más realista y 
+evitar fuga de información.
+
+En la Fase~B se trabajó con una simulación de aprendizaje federado para representar un
+escenario con varios bancos, sin necesidad de reunir todos los datos originales en un solo
+lugar. Los ensambles federados ayudaron a comparar distintas estrategias y a no depender
+únicamente de la información de un banco. Sin embargo, con los resultados obtenidos, 
+el modelo centralizado HistGradientBoosting terminó siendo la mejor opción para 
+generar la inferencia final.
+
+Las principales limitaciones son: (1)~el carácter sintético de los datasets, que puede
+no reflejar con exactitud la distribución de fraude real; (2)~la simulación de federación
+en un único entorno local, sin comunicación real de parámetros entre nodos; y
+(3)~la ausencia de etiqueta confiable en Banco~3, que impide evaluar la calidad real
+de las inferencias generadas.
+
+\section{Anexos del repositorio}
+
+\begin{itemize}[leftmargin=*, itemsep=0pt]
+  \item Notebook Fase A: \texttt{ObjetivoA.ipynb}
+  \item Notebook Fase B: \texttt{ObjetivoB.ipynb}
+  \item Resultados Fase A: \nolinkurl{outputs_fase_A/07_final_model/final_metrics.csv}
+  \item Resumen Fase A: \nolinkurl{outputs_fase_A/07_final_model/final_model_summary.json}
+  \item Resultados Fase B: \nolinkurl{outputs_fase_B/07_reports/selection_table.csv}
+  \item Resumen Fase B: \nolinkurl{outputs_fase_B/07_reports/expected_result_summary.json}
+  \item Inferencia final Banco~3: \nolinkurl{outputs_fase_B/05_predictions/bank_3_full_final_inference.xlsx}
+\end{itemize}
+
+\end{document}
