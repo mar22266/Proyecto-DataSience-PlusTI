@@ -6,6 +6,6 @@
   "bank_3_row_count": 100000,
   "bank_3_expected_fraud_rate": 0.01778,
   "bank_3_probability_mean": 0.1695469686726927,
-  "bank_3_probability_median": 0.152571027250238,
+  "bank_3_probability_median": 0.15257102725023797,
   "bank_3_has_real_labels": false
 }

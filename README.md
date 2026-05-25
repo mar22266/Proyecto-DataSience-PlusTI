@@ -58,7 +58,7 @@ Esta fase implementa una simulacion federada para deteccion de fraude usando Ban
 
 El cuaderno principal es `ObjetivoB.ipynb`. Este notebook carga los tres bancos, realiza un miniEDA por archivo, valida el target en Banco 1 y Banco 2, construye variables comunes incluyendo contadores y acumuladores, controla fuga de informacion, entrena y compara multiples estrategias de modelado, optimiza hiperparametros y genera predicciones binarias para Banco 3.
 
-El objetivo practico es producir inferencias preliminares sobre el primer 30 por ciento de Banco 3 y una inferencia final sobre el 100 por ciento de Banco 3. Como Banco 3 no tiene etiqueta real utilizable, las metricas reales se calculan solo con Banco 1 y Banco 2.
+El objetivo practico es producir inferencias preliminares sobre el primer 30 por ciento de Banco 3 y una inferencia final sobre el 100 por ciento de Banco 3. Como Banco 3 no tiene etiqueta real completa para el 100 por ciento, las metricas reales completas se calculan con Banco 1 y Banco 2. Las correcciones recibidas para el primer 30 por ciento de Banco 3 se usan como validacion parcial para seleccionar la metodologia final del banco objetivo.
 
 ## Datos de entrada
 
@@ -114,9 +114,11 @@ Se entrenan y comparan las siguientes estrategias usando Banco 1 y Banco 2:
 
 Se ejecuta una busqueda con `GridSearchCV` y validacion cruzada estratificada sobre una muestra del conjunto de entrenamiento central. El mejor estimador se reentrena con todos los datos disponibles y compite en la seleccion final junto al resto de estrategias.
 
-### Seleccion de metodologia final
+### Seleccion de metodologia
 
-La estrategia final se selecciona automaticamente con una puntuacion interna que combina F1 promedio, F1 minimo entre bancos, ROC AUC, recall y penalizacion por false positive ratio. La estrategia ganadora se usa para la inferencia final sobre el 100 por ciento de Banco 3.
+Primero se realiza una seleccion interna usando Banco 1 y Banco 2. Esta seleccion combina F1 promedio, F1 minimo entre bancos, ROC AUC, recall y penalizacion por false positive ratio. Bajo este criterio interno, el mejor modelo fue `central_hist_gradient_boosting_model`.
+
+Luego se incorporan las correcciones recibidas sobre el primer 30 por ciento de Banco 3. En esa evaluacion corregida, `federated_equal_weight_model` obtuvo el mejor F1, recall y accuracy entre los modelos con correccion disponible. Por eso, la inferencia final sobre el 100 por ciento de Banco 3 se genera con `federated_equal_weight_model` y umbral `0.60`.
 
 ### Visualizaciones
 
@@ -142,7 +144,7 @@ Las metricas se calculan sobre las validaciones de Banco 1 y Banco 2:
 - `central_valid`
 - Validacion cruzada entre bancos para los modelos locales.
 
-Banco 3 solo recibe inferencias. Se reporta la tasa esperada de fraude predicha y la distribucion de probabilidades, pero no se calculan metricas reales porque no existe etiqueta confiable.
+Banco 3 recibe inferencias preliminares y finales. Para el primer 30 por ciento se incorporan correcciones externas en `data/corregido`, lo que permite comparar parcialmente las estrategias entregadas. Para el 100 por ciento de Banco 3 se reporta la tasa esperada de fraude predicha y la distribucion de probabilidades, pero no se calculan metricas reales completas porque no existe etiqueta confiable para todo el dataset.
 
 ## Guia de uso
 
@@ -162,15 +164,30 @@ El notebook genera resultados en `outputs_fase_B`:
 - `04_models`: modelos entrenados en formato joblib y pesos del ensamble federado.
 - `05_predictions`: archivos Excel de entrega y auditorias CSV.
 - `06_plots`: graficas generadas.
-- `07_reports`: metricas por umbral, seleccion de modelo, tuning de hiperparametros y resumenes finales.
+- `07_reports`: metricas por umbral, seleccion interna de modelo, tuning de hiperparametros, metricas internas del modelo usado para Banco 3 y resumenes finales.
+
+Las correcciones recibidas sobre las inferencias preliminares del primer 30 por ciento de Banco 3 se almacenan en `data/corregido`.
 
 ## Entregables principales
 
-Los archivos de entrega quedan en `outputs_fase_B/05_predictions`:
+Los archivos de entrega quedan en `outputs_fase_B/05_predictions`.
+
+Inferencias preliminares sobre el primer 30 por ciento de Banco 3:
 
 - `bank_3_first_30_baseline_centralized_model.xlsx`
 - `bank_3_first_30_federated_equal_weight_model.xlsx`
 - `bank_3_first_30_federated_performance_weighted_model.xlsx`
+
+Inferencia final sobre el 100 por ciento de Banco 3:
+
 - `bank_3_full_final_inference.xlsx`
 
-Cada Excel contiene unicamente la columna `is_fraud` con valores `True` o `False`.
+Cada Excel de entrega contiene unicamente la columna `is_fraud` con valores `True` o `False`.
+
+La inferencia final `bank_3_full_final_inference.xlsx` se genera con `federated_equal_weight_model` y umbral `0.60`, seleccionado por las correcciones del primer 30 por ciento de Banco 3.
+
+Reportes de soporte generados:
+
+- `outputs_fase_B/05_predictions/final_prediction_summary.csv`: resume el archivo final generado, el modelo usado, el umbral y la cantidad de fraudes predichos.
+- `outputs_fase_B/07_reports/expected_result_summary.json`: documenta la seleccion interna, el modelo final usado para Banco 3 y la tasa esperada de fraude.
+- `outputs_fase_B/07_reports/bank_3_final_strategy_internal_metrics.csv`: contiene la validacion interna en Banco 1 y Banco 2 del modelo usado finalmente para Banco 3.
