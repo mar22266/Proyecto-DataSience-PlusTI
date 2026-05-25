@@ -1,9 +1,11 @@
 {
-  "selected_strategy_name": "central_hist_gradient_boosting_model",
-  "selected_strategy_threshold": 0.85,
+  "internal_selected_strategy_name": "central_hist_gradient_boosting_model",
+  "internal_selected_strategy_threshold": 0.85,
+  "selected_strategy_name": "federated_equal_weight_model",
+  "selected_strategy_threshold": 0.6,
   "bank_3_row_count": 100000,
-  "bank_3_expected_fraud_rate": 0.01739,
-  "bank_3_probability_mean": 0.10910920963095155,
-  "bank_3_probability_median": 0.07788075752722579,
+  "bank_3_expected_fraud_rate": 0.01778,
+  "bank_3_probability_mean": 0.1695469686726927,
+  "bank_3_probability_median": 0.152571027250238,
   "bank_3_has_real_labels": false
 }

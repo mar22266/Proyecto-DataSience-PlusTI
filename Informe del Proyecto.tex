@@ -63,7 +63,8 @@ En la segunda fase se trabajó con tres bancos. Banco~1 y Banco~2 tenían etique
 Banco~3 era el conjunto objetivo que había que predecir, por lo que se
 trató como no etiquetado y se utilizó para generar las inferencias. A partir de
 Banco~1 y Banco~2 se entrenaron modelos locales por banco, se construyeron ensambles federados
-simulados y se compararon contra modelos centralizados.
+simulados y se compararon contra modelos centralizados. Además, las correcciones recibidas sobre el primer 30\% de Banco~3 se usaron para seleccionar
+la metodología final aplicada al 100\% del banco objetivo.
 
 Los notebooks anexos son:
 
@@ -190,10 +191,14 @@ mediante \texttt{GridSearchCV} con validación cruzada estratificada.
 El mejor estimador se reentrenó con todos los datos disponibles antes de competir
 en la selección final.
 
-La selección de la metodología final se realizó mediante puntuaciones compuestas que combinaban
-F1 promedio entre bancos, F1 mínimo entre bancos, ROC AUC, recall y penalización por
-false positive ratio. La estrategia que mejor resultado dió en la puntuación se usó para la
-inferencia final sobre el 100\% de Banco~3.
+Primero se realizó una selección interna usando Banco~1 y Banco~2 mediante puntuaciones
+compuestas que combinaban F1 promedio entre bancos, F1 mínimo entre bancos, ROC AUC,
+recall y penalización por false positive ratio. Esta selección permitió identificar
+el mejor modelo bajo validación interna.
+
+Después, las correcciones recibidas sobre el primer 30\% de Banco~3 se utilizaron
+como criterio específico del banco objetivo. La metodología con mejor desempeño corregido
+en ese subconjunto fue la usada para generar la inferencia final sobre el 100\% de Banco~3.
 
 \section{Descripción de la implementación práctica}
 
@@ -247,7 +252,7 @@ establecido anteriormente para la comparación principal.
 \subsection{Fase B}
 
 Los modelos locales de Banco~1 y Banco~2 se usaron como base para los ensambles federados
-simulados. Para la selección final se compararon seis estrategias candidatas sobre los
+simulados. Para la selección interna  se compararon seis estrategias candidatas sobre los
 conjuntos de validación de Banco~1 y Banco~2. La estrategia final se eligió con una
 puntuación compuesta que pondera F1 promedio, F1 mínimo entre bancos, ROC AUC, recall
 y penaliza el ratio de falsos positivos.
@@ -268,17 +273,36 @@ Federado pesos iguales & 0.60 & 0.544 & 0.393 & 0.863 & 0.556 & 0.467 \\
 \end{tabular}
 \end{center}
 
-La mejor estrategia desarrollada fue \texttt{central\_hist\_gradient\_boosting\_model}
-con umbral 0.85. Los ensambles federados simulados permitieron comparar transferencia
-entre bancos, pero no superaron al mejor modelo centralizado. El federado ponderado
-mejoró al federado de pesos iguales en ratio FP, aunque mantuvo menor estabilidad entre
-bancos.
+En validación interna con Banco~1 y Banco~2, la mejor estrategia fue
+\texttt{central\_hist\_gradient\_boosting\_model} con umbral 0.85. Los ensambles
+federados simulados permitieron comparar transferencia entre bancos, pero no superaron
+al mejor modelo centralizado bajo esta validación interna. Sin embargo, esta selección
+se revisó posteriormente con las correcciones recibidas sobre el primer 30\% de Banco~3.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{0.34\textwidth}rrrrr}
+\toprule
+\textbf{Modelo} & \textbf{Accuracy} & \textbf{Prec.} & \textbf{Recall} & \textbf{F1} & \textbf{Ratio FP} \\
+\midrule
+Baseline centralizado & 97.20\% & 98.44\% & 34.62\% & 51.22\% & 1.56\% \\
+Federado pesos iguales & 97.84\% & 91.84\% & 53.92\% & 67.95\% & 8.16\% \\
+Federado ponderado (Sin correcciones de PlusTi) & -- & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+El modelo federado con pesos iguales obtuvo el mejor F1, recall y accuracy sobre las
+correcciones recibidas del primer 30\% de Banco~3. El modelo federado ponderado no pudo
+compararse en esta etapa porque no se recibió corrección para esa entrega preliminar.
 
 Las inferencias sobre el primer 30\% de Banco~3 se generaron con tres
 estrategias (baseline centralizado, ensamble con pesos iguales y ensamble ponderado)
 y quedan en \nolinkurl{outputs_fase_B/05_predictions}. Para la inferencia final sobre
-el 100\% de Banco~3 se usó la estrategia ganadora, con 1{,}739 fraudes predichos sobre
-100{,}000 transacciones, equivalente a una tasa esperada de 1.74\%.
+el 100\% de Banco~3 se usó \texttt{federated\_equal\_weight\_model} con umbral 0.60,
+al ser la mejor metodología según las correcciones recibidas del primer 30\%.
+El modelo predijo 1{,}778 fraudes sobre 100{,}000 transacciones, equivalente a una
+tasa esperada de 1.78\%.
 
 \section{Dataset 3 con inferencia realizada}
 
@@ -287,6 +311,10 @@ La inferencia final para Banco~3 quedó guardada en:
 \begin{center}
 \nolinkurl{outputs_fase_B/05_predictions/bank_3_full_final_inference.xlsx}
 \end{center}
+
+La inferencia fue generada con \texttt{federated\_equal\_weight\_model} y umbral 0.60.
+Esta elección se basó en las correcciones recibidas sobre el primer 30\% de Banco~3,
+no únicamente en la validación interna con Banco~1 y Banco~2.
 
 El archivo contiene una única columna llamada \texttt{is\_fraud}, con valores
 \texttt{True} o \texttt{False}, y mantiene las 100{,}000 transacciones en el orden de
@@ -311,16 +339,17 @@ evitar fuga de información.
 En la Fase~B se trabajó con una simulación de aprendizaje federado para representar un
 escenario con varios bancos, sin necesidad de reunir todos los datos originales en un solo
 lugar. Los ensambles federados ayudaron a comparar distintas estrategias y a no depender
-únicamente de la información de un banco. Sin embargo, con los resultados obtenidos, 
-el modelo centralizado HistGradientBoosting terminó siendo la mejor opción para 
-generar la inferencia final.
+únicamente de la información de un banco. En la validación interna con Banco~1 y Banco~2,
+el modelo centralizado HistGradientBoosting obtuvo el mejor desempeño. Sin embargo, al
+incorporar las correcciones recibidas sobre el primer 30\% de Banco~3, el ensamble federado
+con pesos iguales mostró mejor desempeño sobre el banco objetivo. Por esa razón,
+\texttt{federated\_equal\_weight\_model} fue la metodología usada para generar la
+inferencia final de Banco~3.
 
 Las principales limitaciones son: (1)~el carácter sintético de los datasets, que puede
 no reflejar con exactitud la distribución de fraude real; (2)~la simulación de federación
-en un único entorno local, sin comunicación real de parámetros entre nodos; y
-(3)~la ausencia de etiqueta confiable en Banco~3, que impide evaluar la calidad real
-de las inferencias generadas.
-
+en un único entorno local, sin comunicación real de parámetros entre nodos; y (3)~la ausencia de etiqueta 
+confiable para el 100\% de Banco~3, que impide evaluar completamente la calidad final de las inferencias generadas.
 \section{Anexos del repositorio}
 
 \begin{itemize}[leftmargin=*, itemsep=0pt]
@@ -329,8 +358,10 @@ de las inferencias generadas.
   \item Resultados Fase A: \nolinkurl{outputs_fase_A/07_final_model/final_metrics.csv}
   \item Resumen Fase A: \nolinkurl{outputs_fase_A/07_final_model/final_model_summary.json}
   \item Resultados Fase B: \nolinkurl{outputs_fase_B/07_reports/selection_table.csv}
-  \item Resumen Fase B: \nolinkurl{outputs_fase_B/07_reports/expected_result_summary.json}
+  \item Resumen esperado Banco~3: \nolinkurl{outputs_fase_B/07_reports/expected_result_summary.json}
   \item Inferencia final Banco~3: \nolinkurl{outputs_fase_B/05_predictions/bank_3_full_final_inference.xlsx}
+  \item Validación interna en Banco~1 y Banco~2 del modelo usado para Banco~3: \nolinkurl{outputs_fase_B/07_reports/bank_3_final_strategy_internal_metrics.csv}
+  \item Correcciones preliminares Banco~3: \nolinkurl{data/corregido}
 \end{itemize}
 
 \end{document}
